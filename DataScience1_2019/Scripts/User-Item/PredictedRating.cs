@@ -24,7 +24,7 @@ namespace DataScience1_2019.Scripts
             }
             double prediction = pred_p1 / sumCo;
 
-            Console.WriteLine($"the predition of {ratedItem} = {prediction}");
+            Console.WriteLine($"the prediction of {ratedItem} = {prediction}");
         }
     }
 }

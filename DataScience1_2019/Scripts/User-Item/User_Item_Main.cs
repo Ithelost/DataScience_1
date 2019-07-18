@@ -14,7 +14,8 @@ namespace DataScience1_2019.Scripts
         {
             // get the dictionary of data from the .txt file
             ReadFile readFile = new ReadFile();
-            readFile.Main(true);
+            readFile.GetUserItemData();
+            //readFile.Grouplens();
             _dict = readFile.dict;
 
             String userId = "-99";
@@ -136,7 +137,7 @@ namespace DataScience1_2019.Scripts
                         q.Add(curArticle.Value);
                     }
                 }
-                // calculate the simularity with euclidean
+                // calculate the simularity
                 double dis = distance.Calculate(p.ToArray(), q.ToArray());
 
                 userDis.Add(item.Key, dis);

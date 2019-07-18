@@ -11,36 +11,25 @@ namespace DataScience1_2019.Scripts
         // the second dictionary has a key of the article with the value of the rating.
         public Dictionary<int, Dictionary<int, double>> dict = new Dictionary<int, Dictionary<int, double>>();
 
-        public void Main(bool isUserItem)
+        public void GetUserItemData()
         {
-            //Grouplens();
-            SchoolData(isUserItem);
-
+            string[] lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\Lesson 1 USER_ITEM_les1.txt");
+            SplitLines(lines);
         }
 
-        private void SchoolData(bool isUserItem)
+        public void GetACSData()
         {
-            // string text = System.IO.File.ReadAllText(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\Lesson 1 USER_ITEM_les1.txt");
-            // System.Console.WriteLine("Contents of WriteText.txt = {0}", text);
-            string[] lines;
-            if (isUserItem)
-            {
-                lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\Lesson 1 USER_ITEM_les1.txt");
-            } else
-            {
-                //lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\ITEM_ITEM.txt");
-                lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\DateDev.txt");
-
-            }
-
-            // populate the dictionary with the values given in the .txt file
-            foreach (string line in lines)
-            {
-                AddDict(line);
-            }
+            string[] lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\ITEM_ITEM.txt");
+            SplitLines(lines);
         }
 
-        private void Grouplens()
+        public void GetDeviationData()
+        {
+            string[] lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\DateDev.txt");
+            SplitLines(lines);
+        }
+
+        public void Grouplens()
         {
             var grouplens = new StreamReader(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\ratings.csv");
             string headline = grouplens.ReadLine();
@@ -56,6 +45,14 @@ namespace DataScience1_2019.Scripts
                     var value = line.Split(',');
                 }
                 
+            }
+        }
+
+        private void SplitLines(string[] lines)
+        {
+            foreach (string line in lines)
+            {
+                AddDict(line);
             }
         }
 

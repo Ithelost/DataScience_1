@@ -6,16 +6,12 @@ namespace DataScience1_2019.Scripts
 {
     class Item_Item_Main
     {
+        ReadFile readFile = new ReadFile();
 
-        private Dictionary<int, Dictionary<int, double>> _dict;
+        private Dictionary<int, Dictionary<int, double>> dict;
 
         public void Main()
         {
-            // get the dictionary of data from the .txt file
-            ReadFile readFile = new ReadFile();
-            readFile.Main(false);
-            _dict = readFile.dict;
-
             String alg = "0";
             while (alg != "acs" && alg != "dev")
             {
@@ -24,7 +20,7 @@ namespace DataScience1_2019.Scripts
             }
 
             String userId = "-99";
-            while (!_dict.ContainsKey(int.Parse(userId)))
+            while (!dict.ContainsKey(int.Parse(userId)))
             {
                 Console.WriteLine("which user are we predicting (make sure it exists)");
                 userId = Console.ReadLine();
@@ -37,7 +33,7 @@ namespace DataScience1_2019.Scripts
             //    itemId = Console.ReadLine();
             //}
 
-            if (_dict.Count >= 1000) RemoveUselessItems(int.Parse(userId));
+            if (dict.Count >= 1000) RemoveUselessItems(int.Parse(userId));
 
             // The Factory design pattern is used here
             switch (alg)
@@ -61,11 +57,11 @@ namespace DataScience1_2019.Scripts
             // creating temp list of items we are going to delete
             List<int> removeList = new List<int>();
 
-            Dictionary<int, double> userItems = _dict[userId];
+            Dictionary<int, double> userItems = dict[userId];
 
             // removing users we can't use in our prediction
             // we need at least 1 extra ratings from the other user
-            foreach (KeyValuePair<int, Dictionary<int, double>> y_item in _dict)
+            foreach (KeyValuePair<int, Dictionary<int, double>> y_item in dict)
             {
                 int sim_items = 0;
                 foreach (KeyValuePair<int, double> x_item in userItems)
@@ -79,26 +75,32 @@ namespace DataScience1_2019.Scripts
 
             foreach (int key in removeList)
             {
-                if (key != userId) _dict.Remove(key);
+                if (key != userId) dict.Remove(key);
             }
 
         }
 
         private void ACS(int userId)
         {
-            ACS acs = new ACS(_dict);
+            readFile.GetACSData();
+            dict = readFile.dict;
+
+            ACS acs = new ACS(dict);
             Dictionary<int, Dictionary<int, double>>  sim = acs.CreateSimList(userId);
 
-            IPrediction pred = new ACS_Prediction(_dict, sim);
+            IPrediction pred = new ACS_Prediction(dict, sim);
             pred.PredictRating(userId);
         }
 
         private void Dev(int userId)
         {
-            Deviation dev = new Deviation(_dict);
+            readFile.GetDeviationData();
+            dict = readFile.dict;
+
+            Deviation dev = new Deviation(dict);
             Dictionary<int, Dictionary<int, Tuple<double, double>>> d = dev.CreateDevList(userId);
 
-            IPrediction pred = new DeviationPrediction(_dict, d);
+            IPrediction pred = new DeviationPrediction(dict, d);
             pred.PredictRating(userId);
         }
     }

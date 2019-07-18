@@ -41,7 +41,7 @@ namespace DataScience1_2019.Scripts
             while (nn.Count != nnCount)
             {
                 // check if the value of this item is higher compared to the old one && ingnore item already in the nn list
-                Tuple<int, double> n = getNearestNeigborg(nn, dict);
+                Tuple<int, double> n = GetNearestNeigborg(nn, dict);
                 if (n.Item1 == -1) break;
                 else dict.Remove(n.Item1);
 
@@ -51,7 +51,7 @@ namespace DataScience1_2019.Scripts
             return nn;
         }
 
-        private Tuple<int, double> getNearestNeigborg(Dictionary<int, double> nn, Dictionary<int, double> dict)
+        private Tuple<int, double> GetNearestNeigborg(Dictionary<int, double> nn, Dictionary<int, double> dict)
         {
             int userId = -1;
             double val = -1;

@@ -13,7 +13,7 @@ namespace DataScience1_2019.Scripts
             this._dict = _dict;
         }
 
-        public Dictionary<int, Dictionary<int, Tuple<double, double>>> Main(int userId, int itemId)
+        public Dictionary<int, Dictionary<int, Tuple<double, double>>> CreateDevList(int userId)
         {
 
             // First we create a list for the deviations
@@ -23,22 +23,21 @@ namespace DataScience1_2019.Scripts
             {
                 foreach (KeyValuePair<int, double> curArticle in item.Value)
                 {
-                    if (!_dict[userId].ContainsKey(curArticle.Key)) break;
                     if (!devList.ContainsKey(curArticle.Key))
                     {
                         devList.Add((curArticle.Key), new Dictionary<int, Tuple<double, double>>());
                     }
                 }
             }
-            if (!devList.ContainsKey(itemId)) devList.Add((itemId), new Dictionary<int, Tuple<double, double>>());
 
+            // now we calculate and add all the items to the list
             foreach (KeyValuePair<int, Dictionary<int, Tuple<double, double>>> x_item in devList)
             {
                 foreach (KeyValuePair<int, Dictionary<int, Tuple<double, double>>> y_item in devList)
                 {
-                    if (!x_item.Value.ContainsKey(y_item.Key) && x_item.Key != y_item.Key && !devList[y_item.Key].ContainsKey(x_item.Key))
+                    if (!x_item.Value.ContainsKey(y_item.Key) && x_item.Key != y_item.Key)
                     {
-                        Tuple<double, double> dev = Dev(x_item.Key, y_item.Key);
+                        Tuple<double, double> dev = CalculateDev(x_item.Key, y_item.Key);
                         devList[x_item.Key].Add(y_item.Key, dev);
                     }
                 }
@@ -48,7 +47,7 @@ namespace DataScience1_2019.Scripts
         }
 
         // this tuple has 2 doubles the first is the deviation and the second the count of user who rated both items
-        private Tuple<double, double> Dev(int x_item, int y_item)
+        private Tuple<double, double> CalculateDev(int x_item, int y_item)
         {
 
             double p1 = 0;

@@ -29,39 +29,24 @@ namespace DataScience1_2019.Scripts
             // TODO change so the dict doesn't have a million items
             RemoveUselessItems(curUserItems, Int32.Parse(userId));
 
-            String alg = "0";
-            while (alg != "euclidean" && alg != "pearson" && alg != "cousine")
-            {
-                Console.WriteLine("whould you like to use [euclidean] or [pearson] or [cousine]");
-                alg = Console.ReadLine();
-            }
-
             // The Factory design pattern is used here
-            switch (alg)
+            //IDistance d = new Euclidean();
+            IDistance d = new Pearson();
+            //IDistance d = new Cousine();
+
+            Dictionary<int, double> dis = GetDistance(d);
+            
+            // this is only if we use the pearson
+            if (d.GetType() == typeof(Pearson))
             {
-                case "euclidean":
-                    IDistance euclidean = new Euclidean();
-                    getDistance(euclidean);
-                    break;
-                case "pearson":
-                    IDistance pearson = new Pearson();
-                    Dictionary<int, double>  dis = getDistance(pearson);
+                NearestNeighborg neighborg = new NearestNeighborg(dis);
+                Dictionary<int, double> nn = neighborg.Main();
+                Console.WriteLine("nearestNeighborg:");
+                Ranking(nn);
 
-                    NearestNeighborg neighborg = new NearestNeighborg(dis);
-                    Dictionary<int, double> nn = neighborg.Main();
-                    Console.WriteLine("nearestNeighborg:");
-                    Ranking(nn);
-
-                    PredictRating(nn);
-                    break;
-                case "cousine":
-                    IDistance cousine = new Cousine();
-                    getDistance(cousine);
-                    break;
-                default:
-                    break;
+                PredictRating(nn);
             }
-
+           
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
         }
@@ -111,13 +96,13 @@ namespace DataScience1_2019.Scripts
             }
             for (int i = 0; i < toPredict.Count; i++)
             {
-                Dictionary<int, double> ratings = getRatingOfNN(toPredict[i], nn);
+                Dictionary<int, double> ratings = GetRatingOfNN(toPredict[i], nn);
                 predictedRating.Main(ratings, nn, toPredict[i]);
             }
             
         }
 
-        private Dictionary<int, double> getRatingOfNN(int toPredict, Dictionary<int, double> nn)
+        private Dictionary<int, double> GetRatingOfNN(int toPredict, Dictionary<int, double> nn)
         {
             // creating a dictionary with userId and rating of the product
             Dictionary<int, double> ratings = new Dictionary<int, double>();
@@ -130,7 +115,7 @@ namespace DataScience1_2019.Scripts
             return ratings;
         }
 
-        private Dictionary<int, double> getDistance(IDistance distance)
+        private Dictionary<int, double> GetDistance(IDistance distance)
         {
             // userId with simularity
             Dictionary<int, double> userDis = new Dictionary<int, double>();
@@ -156,7 +141,7 @@ namespace DataScience1_2019.Scripts
 
                 userDis.Add(item.Key, dis);
             }
-            Console.WriteLine("Distance:");
+            Console.WriteLine($"Interface = {distance.GetType()} Distance of items:");
             Ranking(userDis);
             return userDis;
         }

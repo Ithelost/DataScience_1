@@ -13,15 +13,8 @@ namespace DataScience1_2019.Scripts
 
         public void Main(bool isUserItem)
         {
-            String readFileGrouplens = "0";
-            while (readFileGrouplens != "yes" && readFileGrouplens != "no")
-            {
-                Console.WriteLine("whould you like to use grouplens data [yes] or [no]");
-                readFileGrouplens = Console.ReadLine();
-            }
-
-            if (readFileGrouplens == "yes") Grouplens();
-            else SchoolData(isUserItem);
+            //Grouplens();
+            SchoolData(isUserItem);
 
         }
 
@@ -35,7 +28,8 @@ namespace DataScience1_2019.Scripts
                 lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\Lesson 1 USER_ITEM_les1.txt");
             } else
             {
-                lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\ITEM_ITEM.txt");
+                //lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\ITEM_ITEM.txt");
+                lines = System.IO.File.ReadAllLines(@"C:\Users\jacob\Documents\Visual Studio 2017\Projects\DataScience1_2019\DataScience1_2019\resources\DateDev.txt");
 
             }
 

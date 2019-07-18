@@ -1,56 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataScience1_2019.Scripts
 {
-    class ACS_Prediction
+    class ACS_Prediction : IPrediction
     {
-        private Dictionary<int, Dictionary<int, double>> _dict;
-        private Dictionary<int, Dictionary<int, double>> _sim;
+        private Dictionary<int, Dictionary<int, double>> dict;
+        private Dictionary<int, Dictionary<int, double>> sim;
+
+        private double curMin = double.MaxValue;
+        private double curMax = 0;
 
         public ACS_Prediction(Dictionary<int, Dictionary<int, double>> _dict, Dictionary<int, Dictionary<int, double>> simList)
         {
-            this._dict = _dict;
-            this._sim = simList;
+            dict = _dict;
+            sim = simList;
         }
 
-        public void Main(int userId, int itemId)
-        {
-            PredictRating(userId, itemId);
-        }
-
-        private void PredictRating(int userId, int itemId)
+        public void PredictRating(int userId)
         {
             Norm norm = new Norm();
 
-            double p1 = 0;
-            double p2 = 0;
+            Dictionary<int, double> items = dict[userId];
 
-            Dictionary<int, double> items = _dict[userId];
-
-            foreach (KeyValuePair<int, double> curArticle in items)
+            foreach (KeyValuePair<int, Dictionary<int, double>> s in sim)
             {
-                if (curArticle.Key != itemId)
+                // if our user doesn't have this item we calculate the prediction
+                if (!items.ContainsKey(s.Key))
                 {
-                    if (_sim[itemId].ContainsKey(curArticle.Key))
-                    {
-                        p1 += (norm.Normalize(curArticle.Value, 1, 5) * _sim[itemId][curArticle.Key]);
-                        p2 += _sim[itemId][curArticle.Key];
-                    }
-                    else
-                    {
-                        p1 += (norm.Normalize(curArticle.Value, 1, 5) * (-_sim[curArticle.Key][itemId]));
-                        p2 += (-_sim[curArticle.Key][itemId]);
-                    }
+                    double p1 = 0;
+                    double p2 = 0;
+                    GetMaxMin(items);
 
+                    foreach (KeyValuePair<int, double> i in s.Value)
+                    {
+                        p1 += (norm.Normalize(items[i.Key], curMin, curMax) * i.Value);
+                        if (i.Value < 0) p2 += -i.Value;
+                        else p2 += i.Value;
+                    }
+                    double prediction = norm.Denormalize((p1 / p2), curMin, curMax);
+                    Console.WriteLine("The prediction of user: " + userId + ", item: " + s.Key + " == " + prediction);
                 }
-                
             }
+        }
 
-            double prediction = norm.Denormalize((p1 / p2), 1, 5);
-
-            Console.WriteLine("The prediction of user: " + userId + ", item: " + itemId + " == " + prediction);
+        private void GetMaxMin(Dictionary<int, double> list)
+        {
+            curMin = double.MaxValue;
+            curMax = 0;
+            foreach(KeyValuePair<int, double> item in list)
+            {
+                if (item.Value < curMin) curMin = item.Value;
+                if (item.Value > curMax) curMax = item.Value;
+            }
         }
     }
 }

@@ -30,23 +30,23 @@ namespace DataScience1_2019.Scripts
                 userId = Console.ReadLine();
             }
 
-            String itemId = "-99";
-            while (itemId == "-99" || _dict.ContainsKey(int.Parse(itemId)))
-            {
-                Console.WriteLine("which item are we predicting (make sure it doesn't exists)");
-                itemId = Console.ReadLine();
-            }
+            //String itemId = "-99";
+            //while (itemId == "-99" || _dict.ContainsKey(int.Parse(itemId)))
+            //{
+            //    Console.WriteLine("which item are we predicting (make sure it doesn't exists)");
+            //    itemId = Console.ReadLine();
+            //}
 
-            RemoveUselessItems(int.Parse(userId));
+            if (_dict.Count >= 1000) RemoveUselessItems(int.Parse(userId));
 
             // The Factory design pattern is used here
             switch (alg)
             {
                 case "acs":
-                    ACS(int.Parse(userId), int.Parse(itemId));
+                    ACS(int.Parse(userId));
                     break;
                 case "dev":
-                    Dev(int.Parse(userId), int.Parse(itemId));
+                    Dev(int.Parse(userId));
                     break;
                 default:
                     break;
@@ -84,22 +84,22 @@ namespace DataScience1_2019.Scripts
 
         }
 
-        private void ACS(int userId, int itemId)
+        private void ACS(int userId)
         {
             ACS acs = new ACS(_dict);
-            Dictionary<int, Dictionary<int, double>>  sim = acs.Main(userId, itemId);
+            Dictionary<int, Dictionary<int, double>>  sim = acs.CreateSimList(userId);
 
-            ACS_Prediction pred = new ACS_Prediction(_dict, sim);
-            pred.Main(userId, itemId);
+            IPrediction pred = new ACS_Prediction(_dict, sim);
+            pred.PredictRating(userId);
         }
 
-        private void Dev(int userId, int itemId)
+        private void Dev(int userId)
         {
             Deviation dev = new Deviation(_dict);
-            Dictionary<int, Dictionary<int, Tuple<double, double>>> d = dev.Main(userId, itemId);
+            Dictionary<int, Dictionary<int, Tuple<double, double>>> d = dev.CreateDevList(userId);
 
-            DeviationPrediction pred = new DeviationPrediction(_dict, d);
-            pred.Main(userId, itemId);
+            IPrediction pred = new DeviationPrediction(_dict, d);
+            pred.PredictRating(userId);
         }
     }
 }

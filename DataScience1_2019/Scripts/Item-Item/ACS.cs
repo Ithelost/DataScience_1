@@ -7,20 +7,20 @@ namespace DataScience1_2019.Scripts
     class ACS
     {
 
-        private Dictionary<int, Dictionary<int, double>> _dict;
+        private Dictionary<int, Dictionary<int, double>> dict;
+        private Dictionary<int, double> averageRating = new Dictionary<int, double>();
 
         public ACS(Dictionary<int, Dictionary<int, double>> _dict)
         {
-            this._dict = _dict;
+            this.dict = _dict;
         }
-        public Dictionary<int, Dictionary<int, double>> Main(int userId, int itemId)
+
+        public Dictionary<int, Dictionary<int, double>> CreateSimList(int userId)
         {
             // Get the average rating for all of the users
-            Dictionary<int, double> userAverageRating = new Dictionary<int, double>();
 
-            foreach(KeyValuePair<int, Dictionary<int, double>> item in _dict)
+            foreach(KeyValuePair<int, Dictionary<int, double>> item in dict)
             {
-
                 int countRatedItems = item.Value.Count;
                 double sumRating = 0;
                 foreach (KeyValuePair<int, double> curArticle in item.Value)
@@ -28,38 +28,12 @@ namespace DataScience1_2019.Scripts
                     sumRating += curArticle.Value;
                 }
 
-                double averageRating = sumRating / countRatedItems;
+                double avRating = sumRating / countRatedItems;
 
-                userAverageRating.Add(item.Key, averageRating);
+                averageRating.Add(item.Key, avRating);
             }
 
-            // First we create a list for the simularities
-            Dictionary<int, Dictionary<int, double>> simList = new Dictionary<int, Dictionary<int, double>>();
-
-            foreach (KeyValuePair<int, Dictionary<int, double>> item in _dict)
-            {
-                foreach (KeyValuePair<int, double> curArticle in item.Value)
-                {
-                    if (!_dict[userId].ContainsKey(curArticle.Key)) break;
-                    if (!simList.ContainsKey(curArticle.Key))
-                    {
-                        simList.Add((curArticle.Key), new Dictionary<int, double>());
-                    }
-                }
-            }
-            if (!simList.ContainsKey(itemId)) simList.Add((itemId), new Dictionary<int, double>());
-
-            foreach (KeyValuePair<int, Dictionary<int, double>> x_item in simList)
-            {
-                foreach (KeyValuePair<int, Dictionary<int, double>> y_item in simList)
-                {
-                    if (!x_item.Value.ContainsKey(y_item.Key) && x_item.Key != y_item.Key && !simList[y_item.Key].ContainsKey(x_item.Key))
-                    {
-                        double sim = Simularity(x_item.Key, y_item.Key, userAverageRating);
-                        simList[x_item.Key].Add(y_item.Key, sim);
-                    }
-                }
-            }
+            return GetSimularityList();
 
             //foreach (KeyValuePair<int, Dictionary<int, double>> item in _dict)
             //{
@@ -91,15 +65,46 @@ namespace DataScience1_2019.Scripts
             //        simList[x_item].Add(y_item, sim);
             //    }
             //}
+        }
+
+        private Dictionary<int, Dictionary<int, double>> GetSimularityList()
+        {
+            Dictionary<int, Dictionary<int, double>> simList = new Dictionary<int, Dictionary<int, double>>();
+
+            // create a list of all items containing the dictionary
+            foreach (KeyValuePair<int, Dictionary<int, double>> item in dict)
+            {
+                foreach (KeyValuePair<int, double> curArticle in item.Value)
+                {
+                    if (!simList.ContainsKey(curArticle.Key))
+                    {
+                        simList.Add((curArticle.Key), new Dictionary<int, double>());
+                    }
+                }
+            }
+
+            // add the simularity of all items
+            foreach (KeyValuePair<int, Dictionary<int, double>> x_item in simList)
+            {
+                foreach (KeyValuePair<int, Dictionary<int, double>> y_item in simList)
+                {
+                    if (!x_item.Value.ContainsKey(y_item.Key) && x_item.Key != y_item.Key)
+                    {
+                        double sim = CalculateSimularity(x_item.Key, y_item.Key);
+                        simList[x_item.Key].Add(y_item.Key, sim);
+                    }
+                }
+            }
+
             return simList;
         }
 
-        private double Simularity(int x_item, int y_item, Dictionary<int, double> averageRating)
+        private double CalculateSimularity(int x_item, int y_item)
         {
             double p1 = 0;
             double p2 = 0;
             double p3 = 0;
-            foreach (KeyValuePair<int, Dictionary<int, double>> item in _dict)
+            foreach (KeyValuePair<int, Dictionary<int, double>> item in dict)
             {
                 // check if this uesr rated both item x and y
                 if (item.Value.ContainsKey(x_item) && item.Value.ContainsKey(y_item))
